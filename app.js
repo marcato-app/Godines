@@ -251,7 +251,7 @@
       <article class="featured" data-item="${p.id}">
         <div>
           <p class="eyebrow">Especial da casa</p>
-          <h2>Esfiha Godinês</h2>
+          <h2>Esfiha <em>Godinês</em></h2>
           <p>A receita que leva o nome da casa. Experimente junto com o seu pedido.</p>
           <div class="featured__row">
             <span class="featured__price">${brl(p.price)}</span>
@@ -497,7 +497,7 @@
 
   // ---------- Navegação e animações ----------
   const nav = $("[data-nav]");
-  const syncNav = () => nav.classList.toggle("is-solid", window.scrollY > 120);
+  const syncNav = () => nav.classList.toggle("is-solid", window.scrollY > 160);
   window.addEventListener("scroll", syncNav, { passive: true });
   syncNav();
 
