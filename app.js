@@ -79,19 +79,21 @@
     store.set(STORAGE_KEY, cart);
     renderAll();
     if (qty > before) {
-      toast(`+1 ${PRODUCTS.get(id).name} adicionado`);
+      toast(`${PRODUCTS.get(id).name} · adicionado à sacola`);
       const badge = $("[data-cart-count]");
       badge.classList.remove("bump"); void badge.offsetWidth; badge.classList.add("bump");
     }
   }
 
-  const qtyControl = (id, q) => q > 0
-    ? `<div class="qty" data-id="${id}">
-         <button type="button" class="minus" data-act="dec" aria-label="Remover um">−</button>
+  const ICON_PLUS = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>';
+  const ICON_MINUS = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M5 12h14"/></svg>';
+  const qtyControl = (id, q, name = "") => q > 0
+    ? `<div class="stepper" data-id="${id}">
+         <button type="button" data-act="dec" aria-label="Remover um ${esc(name)}">${ICON_MINUS}</button>
          <output aria-live="polite">${q}</output>
-         <button type="button" class="plus" data-act="inc" aria-label="Adicionar mais um">+</button>
+         <button type="button" data-act="inc" aria-label="Adicionar mais um ${esc(name)}">${ICON_PLUS}</button>
        </div>`
-    : `<button type="button" class="add-btn" data-id="${id}" data-act="inc">Adicionar</button>`;
+    : `<button type="button" class="add" data-id="${id}" data-act="inc" aria-label="Adicionar ${esc(name)}">${ICON_PLUS}</button>`;
 
   // ---------- Cardápio ----------
   const menuEl = $("[data-menu]");
@@ -101,17 +103,21 @@
     tabsEl.innerHTML = MENU.map((c, i) => `<button type="button" class="tab${i === 0 ? " is-active" : ""}" data-target="${c.id}">${c.name}</button>`).join("");
     menuEl.innerHTML = MENU.map((c) => `
       <section class="cat" id="${c.id}" data-cat>
-        <h3 class="cat__title">${c.name} <small>${c.items.length} sabores</small></h3>
-        <div class="grid">
+        <header class="cat__head reveal">
+          <h3 class="cat__title">${c.name}</h3>
+          <span class="cat__count">${c.items.length} ${c.items.length === 1 ? "sabor" : "sabores"}</span>
+        </header>
+        <ul class="dishes">
           ${c.items.map((p) => `
-            <article class="item" data-item="${p.id}" data-search-text="${esc(slug(p.name + " " + c.name))}">
-              <div class="item__info">
-                <p class="item__name">${esc(p.name)}${p.tag ? `<span class="item__tag">${esc(p.tag)}</span>` : ""}</p>
-                <p class="item__price">${brl(p.price)}</p>
+            <li class="dish" data-item="${p.id}" data-search-text="${esc(slug(p.name + " " + c.name))}">
+              <div class="dish__line">
+                <span class="dish__name">${esc(p.name)}${p.tag ? `<span class="dish__tag">${esc(p.tag)}</span>` : ""}</span>
+                <span class="dish__dots" aria-hidden="true"></span>
+                <span class="dish__price">${brl(p.price)}</span>
               </div>
-              <div class="item__ctrl">${qtyControl(p.id, cart[p.id] || 0)}</div>
-            </article>`).join("")}
-        </div>
+              <div class="dish__ctrl"></div>
+            </li>`).join("")}
+        </ul>
       </section>`).join("");
   }
 
@@ -120,9 +126,12 @@
       const id = el.dataset.item;
       const q = cart[id] || 0;
       el.classList.toggle("in-cart", q > 0);
-      const ctrl = $(".item__ctrl", el);
-      const current = ctrl.dataset.q;
-      if (current !== String(q)) { ctrl.innerHTML = qtyControl(id, q); ctrl.dataset.q = q; }
+      const ctrl = $(".dish__ctrl", el);
+      if (ctrl.dataset.q === String(q)) return;
+      const out = $("output", ctrl);
+      if (out && q > 0 && ctrl.dataset.q !== "0") out.textContent = q; // mantém o foco no botão
+      else ctrl.innerHTML = qtyControl(id, q, PRODUCTS.get(id).name);
+      ctrl.dataset.q = q;
     });
   }
 
@@ -142,7 +151,7 @@
 
   // Destaca a aba da categoria visível
   function syncTabs() {
-    const offset = $(".menu__head").getBoundingClientRect().bottom + 20;
+    const offset = $("[data-menubar]").getBoundingClientRect().bottom + 24;
     let active = MENU[0].id;
     $$("[data-cat]").forEach((s) => { if (!s.hidden && s.getBoundingClientRect().top <= offset) active = s.id; });
     $$(".tab", tabsEl).forEach((t) => {
@@ -199,14 +208,18 @@
     const total = cartTotal();
     $("[data-cart-items]").innerHTML = ids.map((id) => {
       const p = PRODUCTS.get(id);
-      return `<div class="cart-line">
-        <p class="cart-line__name">${esc(p.name)}</p>
-        ${qtyControl(id, cart[id])}
-        <p class="cart-line__meta">${esc(p.cat)} · ${brl(p.price)} un. · <strong>${brl(p.price * cart[id])}</strong></p>
-      </div>`;
+      return `<li class="line">
+        <div class="line__info">
+          <p class="line__name">${esc(p.name)}</p>
+          <p class="line__meta">${brl(p.price)} / un.</p>
+        </div>
+        ${qtyControl(id, cart[id], p.name)}
+        <span class="line__sum">${brl(p.price * cart[id])}</span>
+      </li>`;
     }).join("");
     $("[data-cart-empty]").hidden = ids.length > 0;
-    $("[data-checkout]").hidden = ids.length === 0;
+    $("[data-cart-filled]").hidden = ids.length === 0;
+    $("[data-cart-foot]").hidden = ids.length === 0;
     $("[data-send]").disabled = ids.length === 0;
     $("[data-cart-total]").textContent = brl(total);
 
@@ -215,7 +228,7 @@
     badge.hidden = count === 0;
     const bar = $("[data-cartbar]");
     bar.hidden = count === 0;
-    $("[data-cartbar-count]").textContent = `${count} ${count === 1 ? "item" : "itens"}`;
+    $("[data-cartbar-count]").textContent = count;
     $("[data-cartbar-total]").textContent = brl(total);
   }
 
@@ -235,6 +248,8 @@
     const delivery = form.elements.tipo.value === "Entrega";
     addressBox.hidden = !delivery;
     $$("input[required]", addressBox).forEach((i) => { i.disabled = !delivery; });
+    $("[data-pickup]").hidden = delivery;
+    $("[data-fee-note]").hidden = !delivery;
     trocoBox.hidden = form.elements.pagamento.value !== "Dinheiro";
   }
   form.addEventListener("change", syncForm);
@@ -338,6 +353,23 @@
     toastTimer = setTimeout(() => t.classList.remove("show"), 1400);
   }
 
+  // ---------- Navegação e animações ----------
+  const nav = $("[data-nav]");
+  const syncNav = () => nav.classList.toggle("is-solid", window.scrollY > 24);
+  window.addEventListener("scroll", syncNav, { passive: true });
+  syncNav();
+
+  $("[data-year]").textContent = new Date().getFullYear();
+
   renderMenu();
   renderAll();
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); } });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    $$(".reveal").forEach((el) => io.observe(el));
+  } else {
+    $$(".reveal").forEach((el) => el.classList.add("is-in"));
+  }
 })();
