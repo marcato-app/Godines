@@ -131,7 +131,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
-.tabs { display: flex; gap: 8px; padding-block: 12px; overflow-x: auto; scrollbar-width: none; }
+.tabs { position: relative; display: flex; gap: 8px; padding-block: 12px; overflow-x: auto; scrollbar-width: none; }
 @media (min-width: 560px) { .tabs { justify-content: center; } }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {

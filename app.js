@@ -297,7 +297,10 @@
     $$("[data-cat]").forEach((s) => { if (!s.hidden && s.getBoundingClientRect().top <= offset) active = s.id; });
     $$(".tab", tabsEl).forEach((t) => {
       const on = t.dataset.target === active;
-      if (on && !t.classList.contains("is-active")) t.scrollIntoView({ inline: "center", block: "nearest" });
+      // centraliza a aba rolando só a barra (scrollIntoView rolaria a página inteira)
+      if (on && !t.classList.contains("is-active")) {
+        tabsEl.scrollTo({ left: t.offsetLeft - (tabsEl.clientWidth - t.offsetWidth) / 2, behavior: "smooth" });
+      }
       t.classList.toggle("is-active", on);
     });
   }
