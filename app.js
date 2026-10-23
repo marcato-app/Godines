@@ -6,7 +6,7 @@
   const STORAGE_KEY = "godines-carrinho-v1";
   const CUSTOMER_KEY = "godines-cliente-v1";
 
-  // Cardápio 2025
+  // Cardápio (atualizado em out/2026)
   const MENU = [
     {
       id: "salgadas",
@@ -14,10 +14,10 @@
       items: [
         ["Alho", 9.0], ["Atum", 10.0], ["Atum com Catupiry", 11.0], ["Atum com Queijo", 10.5],
         ["Bacon", 9.5], ["Bacon com Catupiry", 10.5], ["Bacon com Cheddar", 10.5], ["Baiana", 9.0],
-        ["Brócolis", 9.5], ["Brócolis com Catupiry", 10.5], ["Brócolis com Cheddar", 10.5],
+        ["Brócolis", 9.5], ["Brócolis com Catupiry", 10.0], ["Brócolis com Cheddar", 10.5],
         ["Calabresa", 9.0], ["Calabresa com Catupiry", 10.5], ["Calabresa com Cheddar", 10.5], ["Calabresa com Queijo", 10.0],
         ["Carne", 9.0], ["Carne com Catupiry", 10.5], ["Carne com Cheddar", 10.5], ["Carne com Queijo", 10.0],
-        ["Catupiry", 9.0], ["Cheddar", 9.0], ["Cheddar com Bacon", 10.5], ["Dois Queijos", 10.0],
+        ["Catupiry", 9.0], ["Cheddar", 9.0], ["Cheddar com Bacon", 10.0], ["Dois Queijos", 10.0],
         ["Escarola", 9.5], ["Escarola com Catupiry", 10.5],
         ["Frango", 9.0], ["Frango com Catupiry", 10.5], ["Frango com Cheddar", 10.5], ["Frango com Queijo", 10.0],
         ["Godinês", 11.5, "Especial da casa"],
@@ -32,7 +32,7 @@
       name: "Esfihas Doces",
       items: [
         ["Banana", 10.0], ["Banana com Chocolate", 9.5], ["Beijinho", 9.0], ["Brigadeiro", 9.0],
-        ["Chocolate", 8.5], ["Chocolate Branco", 9.0], ["Doce de Leite", 8.5], ["Kit Kat", 10.5],
+        ["Chocolate", 8.5], ["Chocolate Branco", 8.0], ["Doce de Leite", 8.5], ["Kit Kat", 10.5],
         ["M&M's", 10.5], ["Ouro Branco", 10.5], ["Ovomaltine", 10.0], ["Prestígio", 10.0],
         ["Romeu e Julieta", 9.5], ["Sonho de Valsa", 10.5],
       ],
